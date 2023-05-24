@@ -63,7 +63,7 @@ ENV X_GEOMETRY=$X_GEOMETRY
 
 EXPOSE 22/tcp
 
-CMD if [ $(stat --printf="%u:%g" /home/$USER) != "$UID:$GID" ]; then echo "Invalid UID/UID of persistent home directory - must match UID in .env ($UID:$GID)"; exit 1; fi && \
+CMD uid_gid=$(stat --printf="%u:%g" /home/$USER); if [ "$uid_gid" != "$UID:$GID" ]; then echo "Invalid UID/UID ($uid_gid) of home directory - must match UID/GID in .env ($UID:$GID)"; exit 1; fi && \
 chmod 755 /home/$USER && \
 mkdir -p /home/$USER/.ssh && \
 echo "$SSH_AUTHORIZED_KEY" > /home/$USER/.ssh/authorized_keys && \
