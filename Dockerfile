@@ -42,7 +42,7 @@ RUN apt-get install -y xfonts-100dpi xfonts-75dpi
 RUN apt-get install -y mate-desktop-environment mate-menu mate-tweak
 
 RUN groupadd --gid $DEV_USER_GID $DEV_USER || echo "Group with desired ID already exists"
-RUN useradd --uid $DEV_USER_ID --user-group --create-home --shell /bin/bash $DEV_USER
+RUN useradd --uid $DEV_USER_ID --gid $DEV_USER_GID --create-home --shell /bin/bash $DEV_USER
 RUN echo "$DEV_USER:$DEV_USER_PASSWORD" | chpasswd
 
 RUN apt-get install -y sudo
