@@ -1,10 +1,10 @@
 # Linux desktop in a docker container
 
-It is a fresh VM of Ubuntu with the Mate desktop - accessible via VNC.
+It is a fresh VM of Ubuntu with the Mate desktop - accessible via SSH/VNC.
 
 The primary use case is a virtualized development environment.
 The user's home directory is persistently kept in the host file system under `persistent_home`.
-Other changed files inside the VM may be persistend via `docker commit` later or by an extension to the `Dockerfile` script.
+Other changed files inside the VM may be made persistent via `docker commit` later or by an extension to the `Dockerfile` script.
 
 ## Requirements
 
@@ -14,7 +14,9 @@ Other changed files inside the VM may be persistend via `docker commit` later or
 ## Configuration
 
 One must adopt the values in `.env` to his own needs.
-Especially __DEV_USER__ , __DEV_USER_ID__ and __SSH_AUTHORIZED_KEY__ must be changed in order access the VM later and have convinient host filesystem access.
+Especially __USER_NAME__, __USER_UID__,  __USER_GID__ and __SSH_AUTHORIZED_KEY__ must be changed in order access the VM later and have convenient host filesystem access.
+
+Also the user and group IDs must match the ones of the directory `persistent_home`, so when it's mounted later, sshd lets us in.
 
 The VNC password & the user's password inside the VM is not security relevant, because the only way to access the machine over the network is SSH with public/private key
 authentication. The default password for VNC and for the user inside the VM is: 'x'.

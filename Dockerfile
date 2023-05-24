@@ -1,9 +1,9 @@
 FROM ubuntu:rolling
 MAINTAINER bitmagier@mailbox.org
 
-ARG USER
-ARG UID
-ARG GID
+ARG USER_NAME
+ARG USER_UID
+ARG USER_GID
 ARG USER_PASSWORD
 ARG VNC_PASSWORD
 ARG SSH_AUTHORIZED_KEY
@@ -41,28 +41,28 @@ RUN apt install -y tigervnc-standalone-server
 RUN apt-get install -y xfonts-100dpi xfonts-75dpi
 RUN apt-get install -y mate-desktop-environment mate-menu mate-tweak
 
-RUN groupadd --gid $GID $USER || echo "Group with desired ID already exists"
-RUN useradd --uid $UID --gid $GID --create-home --shell /bin/bash $USER
-RUN echo "$USER:$USER_PASSWORD" | chpasswd
+RUN groupadd --gid $USER_GID $USER_NAME || echo "Group with desired ID already exists"
+RUN useradd --uid $USER_UID --gid $USER_GID --create-home --shell /bin/bash $USER_NAME
+RUN echo "$USER_NAME:$USER_PASSWORD" | chpasswd
 
 RUN apt-get install -y sudo
 RUN echo >> /etc/sudoers
-RUN echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 RUN mkdir /user_preparation
 COPY vnc_xstartup /user_preparation/
-RUN chown -R $USER /user_preparation
+RUN chown -R $USER_NAME /user_preparation
 
-ENV USER=$USER
-ENV UID=$UID
-ENV GID=$GID
+ENV USER=$USER_NAME
+ENV USER_UID=$USER_UID
+ENV USER_GID=$USER_GID
 ENV SSH_AUTHORIZED_KEY=$SSH_AUTHORIZED_KEY
 ENV VNC_PASSWORD=$VNC_PASSWORD
 ENV X_GEOMETRY=$X_GEOMETRY
 
 EXPOSE 22/tcp
 
-CMD uid_gid=$(stat --printf="%u:%g" /home/$USER); if [ "$uid_gid" != "$UID:$GID" ]; then echo "Invalid UID/UID ($uid_gid) of home directory - must match UID/GID in .env ($UID:$GID)"; exit 1; fi && \
+CMD uid_gid=$(stat --printf="%u:%g" /home/$USER); if [ "$uid_gid" != "$USER_UID:$USER_GID" ]; then echo "Invalid UID/GID ($uid_gid) of mounted 'persistent_home' directory - must match UID/GID in .env ($USER_UID:$USER_GID)."; exit 1; fi && \
 chmod 755 /home/$USER && \
 mkdir -p /home/$USER/.ssh && \
 echo "$SSH_AUTHORIZED_KEY" > /home/$USER/.ssh/authorized_keys && \
@@ -76,4 +76,3 @@ chmod 700 /home/$USER/.vnc/passwd && \
 sudo /etc/init.d/ssh start && \
 /usr/bin/vncserver -geometry $X_GEOMETRY -depth 24 -rfbauth /home/$USER/.vnc/passwd && \
 sleep infinity
-
