@@ -1,16 +1,16 @@
 FROM ubuntu:rolling
 MAINTAINER bitmagier@mailbox.org
 
-ARG DEV_USER
-ARG DEV_USER_ID
-ARG DEV_USER_GID
-ARG DEV_USER_PASSWORD
+ARG USER
+ARG UID
+ARG GID
+ARG USER_PASSWORD
 ARG VNC_PASSWORD
 ARG SSH_AUTHORIZED_KEY
 ARG X_GEOMETRY
 ARG HTTP_PROXY
 
-ENV DEV_USER_PASSWORD=$DEV_USER_PASSWORD
+ENV USER_PASSWORD=$USER_PASSWORD
 ENV http_proxy=$HTTP_PROXY
 ENV https_proxy=$HTTP_PROXY
 
@@ -41,22 +41,21 @@ RUN apt install -y tigervnc-standalone-server
 RUN apt-get install -y xfonts-100dpi xfonts-75dpi
 RUN apt-get install -y mate-desktop-environment mate-menu mate-tweak
 
-RUN groupadd --gid $DEV_USER_GID $DEV_USER || echo "Group with desired ID already exists"
-RUN useradd --uid $DEV_USER_ID --gid $DEV_USER_GID --create-home --shell /bin/bash $DEV_USER
-RUN echo "$DEV_USER:$DEV_USER_PASSWORD" | chpasswd
+RUN groupadd --gid $GID $USER || echo "Group with desired ID already exists"
+RUN useradd --uid $UID --gid $GID --create-home --shell /bin/bash $USER
+RUN echo "$USER:$USER_PASSWORD" | chpasswd
 
 RUN apt-get install -y sudo
 RUN echo >> /etc/sudoers
-RUN echo "$DEV_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 RUN mkdir /user_preparation
 COPY vnc_xstartup /user_preparation/
-RUN chown -R $DEV_USER /user_preparation
+RUN chown -R $USER /user_preparation
 
-USER $DEV_USER_ID
-ENV USER=$DEV_USER
-ENV UID=$DEV_USER_ID
-ENV GID=$DEV_USER_GID
+ENV USER=$USER
+ENV UID=$UID
+ENV GID=$GID
 ENV SSH_AUTHORIZED_KEY=$SSH_AUTHORIZED_KEY
 ENV VNC_PASSWORD=$VNC_PASSWORD
 ENV X_GEOMETRY=$X_GEOMETRY

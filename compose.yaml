@@ -3,17 +3,18 @@ services:
     build:
       dockerfile: Dockerfile
       args:
-        DEV_USER: $DEV_USER
-        DEV_USER_ID: $DEV_USER_ID
-        DEV_USER_GID: $DEV_USER_GID
-        DEV_USER_PASSWORD: $DEV_USER_PASSWORD
+        USER: $USER
+        UID: $UID
+        GID: $GID
+        USER_PASSWORD: $USER_PASSWORD
         VNC_PASSWORD: $VNC_PASSWORD
         SSH_AUTHORIZED_KEY: $SSH_AUTHORIZED_KEY
         X_GEOMETRY: $X_GEOMETRY
         HTTP_PROXY: $HTTP_PROXY
+    user: "$UID:$GID"
     ports:
       - "23:22"
     volumes:
       - type: bind
         source: $PERSISTENT_HOME_FOLDER
-        target: /home/$DEV_USER
+        target: /home/$USER
