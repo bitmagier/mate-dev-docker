@@ -3,6 +3,7 @@ MAINTAINER bitmagier@mailbox.org
 
 ARG DEV_USER
 ARG DEV_USER_ID
+ARG DEV_USER_GID
 ARG DEV_USER_PASSWORD
 ARG VNC_PASSWORD
 ARG SSH_AUTHORIZED_KEY
@@ -40,6 +41,7 @@ RUN apt install -y tigervnc-standalone-server
 RUN apt-get install -y xfonts-100dpi xfonts-75dpi
 RUN apt-get install -y mate-desktop-environment mate-menu mate-tweak
 
+RUN groupadd --gid $DEV_USER_GID $DEV_USER || echo "Group with desired ID already exists"
 RUN useradd --uid $DEV_USER_ID --user-group --create-home --shell /bin/bash $DEV_USER
 RUN echo "$DEV_USER:$DEV_USER_PASSWORD" | chpasswd
 
@@ -53,14 +55,16 @@ RUN chown -R $DEV_USER /user_preparation
 
 USER $DEV_USER_ID
 ENV USER=$DEV_USER
+ENV UID=$DEV_USER_ID
+ENV GID=$DEV_USER_GID
 ENV SSH_AUTHORIZED_KEY=$SSH_AUTHORIZED_KEY
 ENV VNC_PASSWORD=$VNC_PASSWORD
 ENV X_GEOMETRY=$X_GEOMETRY
 
 EXPOSE 22/tcp
 
-CMD chown -R $USER:$USER /home/$USER && \
-chmod 750 /home/$USER && \
+CMD if [ $(stat --printf="%u:%g" /home/$USER) -ne "$UID:$GID" ]; then echo "Invalid UID/UID of persistent home directory - must match UID in .env ($UID:$GID)"; exit 1; fi && \
+chmod 755 /home/$USER && \
 mkdir -p /home/$USER/.ssh && \
 echo "$SSH_AUTHORIZED_KEY" > /home/$USER/.ssh/authorized_keys && \
 chmod 700 /home/$USER/.ssh && \
@@ -69,7 +73,7 @@ mkdir -p /home/$USER/.vnc && \
 cp /user_preparation/vnc_xstartup /home/$USER/.vnc/xstartup && \
 chmod +x /home/$USER/.vnc/xstartup && \
 echo "$VNC_PASSWORD" | vncpasswd -f > /home/$USER/.vnc/passwd && \
-chmod 700  /home/$USER/.vnc/passwd && \
+chmod 700 /home/$USER/.vnc/passwd && \
 sudo /etc/init.d/ssh start && \
 /usr/bin/vncserver -geometry $X_GEOMETRY -depth 24 -rfbauth /home/$USER/.vnc/passwd && \
 sleep infinity
