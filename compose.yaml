@@ -11,6 +11,8 @@ services:
         SSH_AUTHORIZED_KEY: $SSH_AUTHORIZED_KEY
         X_GEOMETRY: $X_GEOMETRY
         HTTP_PROXY: $HTTP_PROXY
+    security_opt:
+      - seccomp:unconfined
     ports:
       - "23:22"
     volumes:
