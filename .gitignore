@@ -1,1 +1,3 @@
 /.idea
+/persistent_home/*
+!/persistent_home/.gitkeep
