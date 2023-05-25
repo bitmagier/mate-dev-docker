@@ -73,6 +73,7 @@ cp /user_preparation/vnc_xstartup /home/$USER/.vnc/xstartup && \
 chmod +x /home/$USER/.vnc/xstartup && \
 echo "$VNC_PASSWORD" | vncpasswd -f > /home/$USER/.vnc/passwd && \
 chmod 700 /home/$USER/.vnc/passwd && \
+rm -rf /user_preparation && \
 sudo /etc/init.d/ssh start && \
 /usr/bin/vncserver -geometry $X_GEOMETRY -depth 24 -rfbauth /home/$USER/.vnc/passwd && \
 sleep infinity
