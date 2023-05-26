@@ -53,6 +53,8 @@ RUN mkdir /user_preparation
 COPY vnc_xstartup /user_preparation/
 RUN chown -R $USER_NAME /user_preparation
 
+EXPOSE 22/tcp
+
 ENV USER=$USER_NAME
 ENV USER_UID=$USER_UID
 ENV USER_GID=$USER_GID
@@ -60,7 +62,7 @@ ENV SSH_AUTHORIZED_KEY=$SSH_AUTHORIZED_KEY
 ENV VNC_PASSWORD=$VNC_PASSWORD
 ENV X_GEOMETRY=$X_GEOMETRY
 
-EXPOSE 22/tcp
+USER $USER_UID
 
 CMD uid_gid=$(stat --printf="%u:%g" /home/$USER); if [ "$uid_gid" != "$USER_UID:$USER_GID" ]; then echo "Invalid UID/GID ($uid_gid) of mounted 'persistent_home' directory - must match UID/GID in .env ($USER_UID:$USER_GID)."; exit 1; fi && \
 chmod 755 /home/$USER && \
@@ -73,7 +75,7 @@ cp /user_preparation/vnc_xstartup /home/$USER/.vnc/xstartup && \
 chmod +x /home/$USER/.vnc/xstartup && \
 echo "$VNC_PASSWORD" | vncpasswd -f > /home/$USER/.vnc/passwd && \
 chmod 700 /home/$USER/.vnc/passwd && \
-rm -rf /user_preparation && \
+sudo rm -rf /user_preparation && \
 sudo /etc/init.d/ssh start && \
 /usr/bin/vncserver -geometry $X_GEOMETRY -depth 24 -rfbauth /home/$USER/.vnc/passwd && \
 sleep infinity
