@@ -19,3 +19,4 @@ services:
       - type: bind
         source: $PERSISTENT_HOME_FOLDER
         target: /home/$USER_NAME
+    hostname: mate

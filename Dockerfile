@@ -40,6 +40,7 @@ RUN apt-get install -y less pwgen git vim
 RUN apt install -y tigervnc-standalone-server 
 RUN apt-get install -y xfonts-100dpi xfonts-75dpi
 RUN apt-get install -y mate-desktop-environment mate-menu mate-tweak
+RUN apt-get install bash-completion qgit bc curl aptitude
 
 RUN groupadd --gid $USER_GID $USER_NAME || echo "Group with desired ID already exists"
 RUN useradd --uid $USER_UID --gid $USER_GID --create-home --shell /bin/bash $USER_NAME
@@ -75,7 +76,6 @@ cp /user_preparation/vnc_xstartup /home/$USER/.vnc/xstartup && \
 chmod +x /home/$USER/.vnc/xstartup && \
 echo "$VNC_PASSWORD" | vncpasswd -f > /home/$USER/.vnc/passwd && \
 chmod 700 /home/$USER/.vnc/passwd && \
-sudo rm -rf /user_preparation && \
 sudo /etc/init.d/ssh start && \
 /usr/bin/vncserver -geometry $X_GEOMETRY -depth 24 -rfbauth /home/$USER/.vnc/passwd && \
 sleep infinity
