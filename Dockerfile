@@ -40,7 +40,7 @@ RUN apt-get install -y less pwgen git vim
 RUN apt install -y tigervnc-standalone-server 
 RUN apt-get install -y xfonts-100dpi xfonts-75dpi
 RUN apt-get install -y mate-desktop-environment mate-menu mate-tweak
-RUN apt-get install bash-completion qgit bc curl aptitude
+RUN apt-get install -y bash-completion qgit bc curl aptitude
 
 RUN groupadd --gid $USER_GID $USER_NAME || echo "Group with desired ID already exists"
 RUN useradd --uid $USER_UID --gid $USER_GID --create-home --shell /bin/bash $USER_NAME
